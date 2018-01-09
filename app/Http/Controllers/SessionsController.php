@@ -27,8 +27,15 @@ class SessionsController extends Controller
         ]);
 
         if (Auth::attempt($validate, $request->has('remeber'))) {
-            session()->flash('success', '登录成功');
-            return redirect()->route('users.show', [Auth::user()]);
+            if(Auth::user()->activated){
+                session()->flash('success', '登录成功');
+                return redirect()->route('users.show', [Auth::user()]);
+            } else {
+                Auth::logout();
+                session()->flash('success', '请激活后在登录');
+                return redirect()->route('login');
+            }
+            
         } else {
             session()->flash('danger', '登录失败');
             return redirect()->back();
